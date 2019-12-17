@@ -1,2 +1,2 @@
 # CoScan
-Virtual scan for Multi-Robot Collaborative Dense Scene Reconstruction.
+Virtual scan for the paper Multi-Robot Collaborative Dense Scene Reconstruction.
