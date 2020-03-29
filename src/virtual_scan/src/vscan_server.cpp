@@ -17,7 +17,8 @@
 
 #include <stdio.h> 
 #include <stdlib.h> 
-// socket
+#include <fstream>
+#include <sstream>
 #include <sys/types.h> 
 #include <netinet/in.h> 
 #include <sys/socket.h> 
@@ -25,21 +26,16 @@
 #include <pthread.h>
 #include <netinet/tcp.h>
 
-//#include <octomap/octomap.h>
-
-#include <fstream>
-#include <sstream>
-
 using namespace std;
 
-#define SERVPORT 3333 /*服务器监听端口号 */
-int sockfd,client_fd,sin_size; /*sock_fd:监听 socket;client_fd:数据传输 socket */
-struct sockaddr_in my_addr; /* 本机地址信息 */
-struct sockaddr_in remote_addr; /* 客户端地址信息 */
-const int MAXRECV = 10240;
-#define BACKLOG 10 /* 最大同时连接请求数 */
-
 #define PI 3.1415926
+
+#define SERVPORT 3333 
+int sockfd,client_fd,sin_size; 
+struct sockaddr_in my_addr; 
+struct sockaddr_in remote_addr; 
+const int MAXRECV = 10240;
+#define BACKLOG 10 
 
 int rbtnum = 3;
 float camera_height = 1.1;
@@ -49,8 +45,6 @@ cv::Mat shortImg(480, 640, CV_16UC1);
 bool rgb_ready = false;
 bool depth_ready = false;
 
-// ros node handle
-//ros::NodeHandle n;
 // image transport
 image_transport::ImageTransport* it;
 // rgbd data from topics
@@ -74,22 +68,10 @@ const float camera_fy = 554.382713;
 const int times = 1.0;
 float rbt_v = 1.0/times - 0.01;
 
-// 每次移动走路径的比例
-const double move_distance_rate = 1;
-
-//vector< vector< float > > objective_positions;
+//const double move_distance_rate = 1; 
 
 // data offline rcv writer
 ofstream ofs_off;
-
-// void int2str(int n, char* ch)
-// {
-//     stringstream ss;
-//     string s;
-//     ss<<n;
-//     ss>>s;
-//     strcpy(ch, const_cast<char*>(s.c_str()));
-// } 
 
 string int2str(int n)
 {
@@ -118,8 +100,6 @@ void rgbImageCallback(const sensor_msgs::ImageConstPtr& msg, const std::string &
     cv_bridge::CvImagePtr cvImgPtr;
     cv::Mat rgbPass; 
 
-    //rgbPass.clone(); // test
-
     try
     {
         cvImgPtr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -130,19 +110,7 @@ void rgbImageCallback(const sensor_msgs::ImageConstPtr& msg, const std::string &
         ROS_ERROR("cv_bridge exception: %s", e.what());
     }
 
-    // way 1
     crt_rgb_images[rbtIndex] = rgbPass; 
-
-    // // way 2. 2019-09-18.
-    // for (int i = 0; i < 480; ++i)
-    // {
-    //     for (int j = 0; j < 640; ++j)
-    //     {
-    //         crt_rgb_images[rbtIndex].ptr<cv::Vec3b>(i)[j][0] = rgbPass.ptr<cv::Vec3b>(i)[j][0];
-    //         crt_rgb_images[rbtIndex].ptr<cv::Vec3b>(i)[j][1] = rgbPass.ptr<cv::Vec3b>(i)[j][1];
-    //         crt_rgb_images[rbtIndex].ptr<cv::Vec3b>(i)[j][2] = rgbPass.ptr<cv::Vec3b>(i)[j][2];
-    //     }
-    // }
 }
 
 // depth frame callback. 2018-09-10. no mem leak. 2018-09-19.
@@ -167,7 +135,6 @@ void depthImageCallback(const sensor_msgs::ImageConstPtr& msg, const std::string
 
     cv::Mat shortPass(480, 640, CV_16UC1); 
 
-    // way 1
     for (int i = 0; i < 480; ++i)
     {
         for (int j = 0; j < 640; ++j)
@@ -176,24 +143,11 @@ void depthImageCallback(const sensor_msgs::ImageConstPtr& msg, const std::string
         }
     }
     crt_depth_images[rbtIndex] = shortPass; 
-    
-    // // way 2. 2019-09-18.
-    // for (int i = 0; i < 480; ++i)
-    // {
-    //     for (int j = 0; j < 640; ++j)
-    //     {
-    //         crt_depth_images[rbtIndex].ptr<short>(i)[j] = (short)(depthImg.ptr<float>(i)[j] * 1000); 
-    //     }
-    // }
 }
 
 // pose
 void callForPose(int id){
     gazebo_msgs::GetModelState getmodelstate;
-    //string s;
-    //stringstream ss;
-    //ss<<"test"<<id;
-    //ss>>s;
     char s[10];
     sprintf(s, "robot_%d", id);
     getmodelstate.request.model_name = (std::string) s;
@@ -206,7 +160,6 @@ void callForPose(int id){
     {
       ROS_ERROR("Failed to call service");
     }
-    //printf("position x: %f\n", getmodelstate.response.pose.position.x);
     pose[0] = getmodelstate.response.pose.position.x;
     pose[1] = getmodelstate.response.pose.position.y;
     pose[2] = getmodelstate.response.pose.position.z;
@@ -214,7 +167,6 @@ void callForPose(int id){
     pose[4] = getmodelstate.response.pose.orientation.y;
     pose[5] = getmodelstate.response.pose.orientation.z;
     pose[6] = getmodelstate.response.pose.orientation.w;
-    //printf("call and get pose of robot%d q:\n w: %f, x: %f, y: %f, z: %f\n", id, pose[6], pose[3], pose[4], pose[5]);
     pose_ready = true;
 }
 
@@ -223,10 +175,7 @@ void setForPose(int id, float x, float y, float z, float qx, float qy, float qz,
     printf("set pose for robot %d...", id);
 
     gazebo_msgs::SetModelState setmodelstate;
-    //string s;
-    //stringstream ss;
-    //ss<<"test"<<id;
-    //ss>>s;
+
     char s[10];
     sprintf(s, "robot_%d", id);
     geometry_msgs::Pose posemsg;
@@ -255,7 +204,7 @@ void infoCallback(const sensor_msgs::CameraInfoConstPtr &msg){
     //printf("fx: %lf\n", msg->K[0]);
 }
 
-//接收数据
+// recv
 int recvData(const int client_fd, char buf[], int len)
 {
     memset (buf, 0, len);
@@ -294,7 +243,7 @@ int recvData(const int client_fd, char buf[], int len)
     }
 }
 
-// send data. 向指定客户端发送数据
+// send
 bool sendData(const int client_fd, const char *ch, const int len)
 {
     int status = send(client_fd, ch, len, 0);
@@ -328,17 +277,13 @@ int sendTotalData(const int client_fd, const char *buf, const int len){
 // socket get rgbd
 bool getRGBD(int client_fd){
 
-//printf("-2\n");
-
     ros::spinOnce();
 
-//printf("-1\n");
-
     ros::Rate rate(1); // 1hz
-    //ros::Rate rate(10); // 10hz. 01-09. wrong!
+
     rate.sleep();
 
-//printf("0\n");
+
     // rgb
     {
         int data_len = 480 * 640 * 3 * sizeof(uchar) * rbtnum;
@@ -349,7 +294,6 @@ bool getRGBD(int client_fd){
             usleep(100000);
             rgbData = (char *)malloc(data_len);
         }
-//printf("1\n");
 
         // for multi robot
         int ind = 0;
@@ -369,14 +313,9 @@ bool getRGBD(int client_fd){
             }
         }
 
-//printf("2\n");
-
-        //bool rtnCode = sendData(client_fd, rgbData, data_len);
         int rtnCode = sendTotalData(client_fd, rgbData, data_len);
         printf("rgb data %d byte send back done. rtnCode = %d\n", data_len, rtnCode);
         free(rgbData);
-
-//printf("3\n");
 
     }   
     // depth
@@ -408,7 +347,6 @@ bool getRGBD(int client_fd){
         printf("depth data %d byte send back done. rtnCode = %d\n", data_len, rtnCode);
         free(depthData);
         
-//printf("4\n");
     }
 
     return true;
@@ -417,48 +355,8 @@ bool getRGBD(int client_fd){
 // socket get depth
 bool getDepth(int client_fd){
 
-    printf("this method are abandoned");
+    printf("this method is abandoned");
     getchar();
-    
-    /*
-
-    ros::spinOnce();
-    //char* depthData = (char *)malloc(480 * 640 * (sizeof(short)) * rbtnum);
-    int data_len = 480 * 640 * sizeof(short) * rbtnum;
-    char* depthData = (char *)malloc(data_len);
-    // rbt0
-    int ind = 0;
-    for (int i = 0; i < 480; ++i)
-    {
-        for (int j = 0; j < 640; ++j)
-        {
-            memcpy(&depthData[ind], &shortImg0.ptr<short>(i)[j], sizeof(short));
-            ind+=sizeof(short);
-        }
-    }
-    // rbt1
-    for (int i = 0; i < 480; ++i)
-    {
-        for (int j = 0; j < 640; ++j)
-        {
-            memcpy(&depthData[ind], &shortImg1.ptr<short>(i)[j], sizeof(short));
-            ind+=sizeof(short);
-        }
-    }
-    // rbt2
-    for (int i = 0; i < 480; ++i)
-    {
-        for (int j = 0; j < 640; ++j)
-        {
-            memcpy(&depthData[ind], &shortImg2.ptr<short>(i)[j], sizeof(short));
-            ind+=sizeof(short);
-        }
-    }
-    sendData(client_fd, depthData, data_len);
-    printf("depth send back\n");
-    free(depthData);
-
-    */
 
     return true;
 }
@@ -643,10 +541,8 @@ bool move_to_views(int client_fd){
         //    set_pose[3], set_pose[4], set_pose[5], set_pose[6]);
     }
 
-//printf("before free()\n");
     // free 
     free(poseData);
-//printf("after free()\n");
 
     printf("func move_to_views end\n\n");
 
@@ -654,7 +550,6 @@ bool move_to_views(int client_fd){
     
     ros::spinOnce();
     ros::Rate rate(1);
-    //ros::Rate rate(10); // 01-09.
     rate.sleep();
 
     return true;
@@ -670,9 +565,7 @@ bool setPose(int client_fd){
         usleep(100000);
         poseData = (char *)malloc(data_len);
     }
-//printf("before recv\n");
     int rcv_len = recvData(client_fd, poseData, data_len);
-//printf("after recv\n");
     float pass_pose[rbtnum][7];
     int ind = 0;
     for (int id = 0; id < rbtnum; ++id)
@@ -684,24 +577,11 @@ bool setPose(int client_fd){
             memcpy(&pass_pose[id][i], &poseData[ind], sizeof(float));
             ind+=sizeof(float);
         }
-        // setForPose(id, 
-        //     set_pose[0], set_pose[1], set_pose[2], 
-        //     set_pose[3], set_pose[4], set_pose[5], set_pose[6]);
-        // printf("client pose for robot%d: %f, %f, %f, %f, %f, %f, %fn", id, 
-        //     set_pose[0], set_pose[1], set_pose[2],
-        //     set_pose[3], set_pose[4], set_pose[5], set_pose[6]);
     }
     goToPose(
         pass_pose[0][0], pass_pose[0][1], pass_pose[0][3], pass_pose[0][4], pass_pose[0][5], pass_pose[0][6],
         pass_pose[1][0], pass_pose[1][1], pass_pose[1][3], pass_pose[1][4], pass_pose[1][5], pass_pose[1][6],
         pass_pose[2][0], pass_pose[2][1], pass_pose[2][3], pass_pose[2][4], pass_pose[2][5], pass_pose[2][6]);
-    // // write to offline
-    // ofs_off<<pass_pose[0][0]<<" "<<pass_pose[0][1]<<" "<<1<<" "
-    // << pass_pose[0][3]<<" "<<pass_pose[0][4]<<" "<<pass_pose[0][5]<<" "<<pass_pose[0][6]<<endl;
-    // ofs_off<<pass_pose[1][0]<<" "<<pass_pose[1][1]<<" "<<1<<" "
-    // << pass_pose[1][3]<<" "<<pass_pose[1][4]<<" "<<pass_pose[1][5]<<" "<<pass_pose[1][6]<<endl;
-    // ofs_off<<pass_pose[2][0]<<" "<<pass_pose[2][1]<<" "<<1<<" "
-    // << pass_pose[2][3]<<" "<<pass_pose[2][4]<<" "<<pass_pose[2][5]<<" "<<pass_pose[2][6]<<endl;
     free(poseData);
     printf("\nsetPose: done.\n");
     return true;
@@ -723,7 +603,8 @@ vector< PositionInGazebo > task_poses;
 
 // set path
 bool setPath(int client_fd){
-	// clear and resize path_poses
+    /*
+	/// clear and resize path_poses
 	path_poses.clear();
 	path_poses.resize(rbtnum);
 	// recv path data
@@ -791,13 +672,6 @@ bool setPath(int client_fd){
 	{
 		// move for no path robot
 		if(path_poses[rid].size() == 1){
-			
-			// callForPose(rid);
-			// float dir_theta = PI/3;
-   //      	// set pose
-   //      	setForPose(rid, , , camera_height, 0.0*sin(dir_theta/2), 0.0*sin(dir_theta/2), 1.0*sin(dir_theta/2), cos(dir_theta/2));
-			// printf("rbt%d dont move\n", rid);
-			// printf("rbt%d set to (%f, %f)\n", rid, pose[0], pose[1]);
 			
 			callForPose(rid);
 			float obj_x=.1, obj_y=.1, crt_x = .1, crt_y = .1;
@@ -942,8 +816,8 @@ bool setPath(int client_fd){
 				 		// lst_x = path_poses[rid][pid].x;
 				 		// lst_y = path_poses[rid][pid].y;
 			 		}
-		 			{/* dai shi xian */
-			 			
+		 			{
+                        // to do?
 		 			}
 
 			 		break;
@@ -1001,6 +875,9 @@ bool setPath(int client_fd){
 	//getchar();
 
 	printf("move correctly\n");
+
+    //*/
+
 	return true;
 }
 
@@ -1127,7 +1004,6 @@ bool change_robot_number(int client_fd)
 // thread
 void *thread(void *ptr)
 {
-    //unsigned int tid = (unsigned int)pthread_self(); //获取当前线程id
     int client = *(int *)ptr;
     bool stopped=false;
     while(!stopped)
@@ -1285,21 +1161,21 @@ int main(int argc, char **argv){
     // return 0;
 
     // socket
-    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)//建立 socket
+    if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("socket");
         exit(1);
     }
     my_addr.sin_family=AF_INET;
     my_addr.sin_port=htons(SERVPORT);
-    my_addr.sin_addr.s_addr = INADDR_ANY; //表示监听任何地址
+    my_addr.sin_addr.s_addr = INADDR_ANY; 
     bzero(&(my_addr.sin_zero),8);
-    if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1) //将本机地址与建立的套接字号进行绑定
+    if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1) 
     {
         perror("bind");
         exit(1);
     }
-    if (listen(sockfd, BACKLOG) == -1) //开始监听
+    if (listen(sockfd, BACKLOG) == -1) 
     {
         perror("listen");
         exit(1);
@@ -1308,9 +1184,9 @@ int main(int argc, char **argv){
     // set keepalive
     {
         int keepAlive = 1; // enable keepalive
-        int keepIdle = 60; // 如该连接在60秒内没有任何数据往来,则进行探测 
-        int keepInterval = 5; // 探测时发包的时间间隔为5 秒
-        int keepCount = 3; // 探测尝试的次数.如果第1次探测包就收到响应了,则后2次的不再发
+        int keepIdle = 60; // 60 second
+        int keepInterval = 5; // 5 second
+        int keepCount = 3; 
         setsockopt(client_fd, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
         setsockopt(client_fd, SOL_TCP, TCP_KEEPIDLE, (void*)&keepIdle, sizeof(keepIdle));
         setsockopt(client_fd, SOL_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
@@ -1331,7 +1207,7 @@ int main(int argc, char **argv){
 
         printf("%s\n", "waiting for a connection");
 
-        client_fd = accept(sockfd, (struct sockaddr*)&remote_addr, (socklen_t *) &sin_size); //接收客户端的连接
+        client_fd = accept(sockfd, (struct sockaddr*)&remote_addr, (socklen_t *) &sin_size); 
 
         if (client_fd == -1)
         {
@@ -1343,10 +1219,10 @@ int main(int argc, char **argv){
         
         // set keepalive
         {
-            int keepAlive = 1; // enable keepalive
-            int keepIdle = 60; // 如该连接在60秒内没有任何数据往来,则进行探测 
-            int keepInterval = 5; // 探测时发包的时间间隔为5 秒
-            int keepCount = 3; // 探测尝试的次数.如果第1次探测包就收到响应了,则后2次的不再发
+            int keepAlive = 1;
+            int keepIdle = 60; 
+            int keepInterval = 5; 
+            int keepCount = 3; 
             setsockopt(client_fd, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepAlive, sizeof(keepAlive));
             setsockopt(client_fd, SOL_TCP, TCP_KEEPIDLE, (void*)&keepIdle, sizeof(keepIdle));
             setsockopt(client_fd, SOL_TCP, TCP_KEEPINTVL, (void *)&keepInterval, sizeof(keepInterval));
