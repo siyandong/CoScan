@@ -25,7 +25,8 @@ int main(int argc, char **argv)
     {
         g_rbtTrajectories.resize(rbt_num);
         g_camTrajectories.resize(rbt_num);
-        // test
+
+        // todo: move params to config file.
         g_scene_boundary.clear();
         g_scene_boundary.push_back(cv::Point(560, 478));
         g_scene_boundary.push_back(cv::Point(560, 710));
@@ -39,13 +40,6 @@ int main(int argc, char **argv)
 
     // navigation
     Navigation nav(de, 8);
-/*
-    // test geodesic
-    {
-        nav.test();
-        exit(-1);
-    }
-//*/
 
     // progressive scanning
     cerr << "scanning surroundings..." << endl;
@@ -61,12 +55,11 @@ PLAN:
         g_plan_iteration++;
         goto SCAN;
         
-        // todo
-        goto END;
+        //goto END;
 SCAN:
         // ask robot to move and scan 
         nav.moveRobotsAndScan();
-        // todo
+
         goto PLAN;
     }
     // finished.

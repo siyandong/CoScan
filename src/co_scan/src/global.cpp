@@ -1,8 +1,8 @@
 #pragma once
-#include "global.h" 			// global variables
+#include "global.h" // global variables
 
 // cluster compact constraint
-double compactParam = 20; // voxels. todo: config file.
+double compactParam = 20; // \delta, whos unit is voxel. todo: move to config file.
 double g_distance_step = 0.5; // meter.
 // angle constraint
 double g_angleDifference = PI/3 - 0.05;
