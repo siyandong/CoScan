@@ -1,0 +1,13 @@
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find virtual_scan)/worlds/real_hm.world"/>
+    <!-- more default parameters can be changed here -->
+  </include>
+  <!-- Spawn a robot into Gazebo -->
+  <node name="spawn_urdf0" pkg="gazebo_ros" type="spawn_model" args="-file $(find virtual_scan)/srbot_description/srbot0.urdf -urdf -y -1 -z 1.6 -model test0" />
+  <node name="spawn_urdf1" pkg="gazebo_ros" type="spawn_model" args="-file $(find virtual_scan)/srbot_description/srbot1.urdf -urdf -y 0 -z 1.6 -model test1" />
+  <node name="spawn_urdf2" pkg="gazebo_ros" type="spawn_model" args="-file $(find virtual_scan)/srbot_description/srbot2.urdf -urdf -y 1 -z 1.6 -model test2" />
+  <node name="spawn_urdf3" pkg="gazebo_ros" type="spawn_model" args="-file $(find virtual_scan)/srbot_description/srbot3.urdf -urdf -y 2 -z 1.6 -model test3" />
+  <node name="spawn_urdf4" pkg="gazebo_ros" type="spawn_model" args="-file $(find virtual_scan)/srbot_description/srbot4.urdf -urdf -y 3 -z 1.6 -model test4" />
+</launch>
