@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<launch>
+
+<node name="init_locations" pkg="virtual_scan" type="init_locations"/>
+<node name="vscan_server" pkg="virtual_scan" type="vscan_server"/>	
+<!--node name="co_scan" pkg="co_scan" type="co_scan"/-->
+
+</launch>

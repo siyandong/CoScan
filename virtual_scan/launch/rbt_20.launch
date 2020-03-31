@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<node name="spawn_rbt_0" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot0.urdf -urdf -model robot_0" />	
+	<node name="spawn_rbt_1" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot1.urdf -urdf -model robot_1" />
+	<node name="spawn_rbt_2" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot2.urdf -urdf -model robot_2" />
+	<node name="spawn_rbt_3" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot3.urdf -urdf -model robot_3" />
+	<node name="spawn_rbt_4" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot4.urdf -urdf -model robot_4" />
+	<node name="spawn_rbt_5" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot5.urdf -urdf -model robot_5" />
+	<node name="spawn_rbt_6" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot6.urdf -urdf -model robot_6" />
+	<node name="spawn_rbt_7" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot7.urdf -urdf -model robot_7" />
+	<node name="spawn_rbt_8" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot8.urdf -urdf -model robot_8" />
+	<node name="spawn_rbt_9" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot9.urdf -urdf -model robot_9" />
+	<node name="spawn_rbt_10" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot10.urdf -urdf -model robot_10" />
+	<node name="spawn_rbt_11" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot11.urdf -urdf -model robot_11" />
+	<node name="spawn_rbt_12" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot12.urdf -urdf -model robot_12" />
+	<node name="spawn_rbt_13" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot13.urdf -urdf -model robot_13" />
+	<node name="spawn_rbt_14" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot14.urdf -urdf -model robot_14" />
+	<node name="spawn_rbt_15" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot15.urdf -urdf -model robot_15" />
+	<node name="spawn_rbt_16" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot16.urdf -urdf -model robot_16" />
+	<node name="spawn_rbt_17" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot17.urdf -urdf -model robot_17" />
+	<node name="spawn_rbt_18" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot18.urdf -urdf -model robot_18" />
+	<node name="spawn_rbt_19" pkg="gazebo_ros" type="spawn_model" args="-file $(find srbot_description)/urdf/gazebo9/srobot19.urdf -urdf -model robot_19" />
+
+</launch>
