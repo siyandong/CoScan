@@ -1,5 +1,5 @@
-# CoScan
-Implementation on top of ROS for the virtual scan of the paper Multi-Robot Collaborative Dense Scene Reconstruction (SIGGRAPH 2019).
+# Multi-Robot Collaborative Dense Scene Reconstruction (SIGGRAPH 2019)
+We provide the implementation of the optimal-mass-transport algorithm tailored for collaborative scanning along with virtual scan examples, on top of ROS.
 
 # Requirements
 This package depends on OpenCV, CGAL and OctoMap. Please install these libraries first.
