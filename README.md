@@ -6,7 +6,7 @@ This package depends on OpenCV, CGAL and OctoMap. Please install these libraries
 
 # Download and Installation
 ```
-catkin_ws$ git clone 
+catkin_ws/src$ git clone https://github.com/siyandong/CoScan.git
 catkin_ws$ catkin_make_isolated
 ```
 
