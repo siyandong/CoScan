@@ -8,6 +8,7 @@
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="bamboo@todo.todo">bamboo</maintainer>
+  <license>MIT</license>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
